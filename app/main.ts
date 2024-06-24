@@ -9,8 +9,19 @@ const server = net.createServer((socket) => {
     socket.end();
   });
 
-  socket.write("HTTP/1.1 200 OK\r\n\r\n");
-  socket.pipe(socket);
+  socket.on("data", (req: Buffer) => {
+    const reqS = req.toString();
+    const path = reqS.split(" ")[1];
+    const res =
+      path === "/"
+        ? "HTTP/1.1 200 OK\r\n\r\n"
+        : "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+    socket.write(res);
+    socket.end();
+  });
+
+  // socket.write("HTTP/1.1 200 OK\r\n\r\n");
+  // socket.pipe(socket);
 });
 
 server.listen(4221, "localhost");
