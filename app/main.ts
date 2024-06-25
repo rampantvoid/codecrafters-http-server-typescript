@@ -1,7 +1,19 @@
 import * as net from "net";
+import { devNull } from "os";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
+
+const usePathVariable = (req: Buffer, path: string) => {
+  const reqPath = req.toString().split(" ")[1];
+  if (reqPath === "/") return "/";
+  if (reqPath.includes(path)) {
+    const pathVar = reqPath.substring(reqPath.lastIndexOf(path) + path.length);
+    return pathVar;
+  } else {
+    return null;
+  }
+};
 
 // Uncomment this to pass the first stage
 const server = net.createServer((socket) => {
@@ -10,18 +22,15 @@ const server = net.createServer((socket) => {
   });
 
   socket.on("data", (req: Buffer) => {
-    const reqS = req.toString();
-    const path: string = reqS.split(" ")[1];
-    console.log(path);
+    const pathVar = usePathVariable(req, "echo/");
     let res = "";
 
-    if (path === "/") {
+    if (pathVar === "/") {
       res = "HTTP/1.1 200 OK\r\n\r\n";
-    } else if (path.startsWith("/echo/")) {
-      let tmp = path.split("/")[2];
-      res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${tmp.length}\r\n\r\n${tmp}`;
-    } else {
+    } else if (pathVar === null) {
       res = "HTTP/1.1 404 Not Found\r\n\r\n";
+    } else {
+      res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${tmp.length}\r\n\r\n${tmp}`;
     }
 
     // const res =
