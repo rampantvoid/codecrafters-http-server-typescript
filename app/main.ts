@@ -97,7 +97,6 @@ const server = net.createServer((socket) => {
 
         readFile(filePath)
           .then((data) => {
-            console.log(data);
             socket.write(
               `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${
                 data.toString().length
@@ -106,9 +105,10 @@ const server = net.createServer((socket) => {
             socket.end();
           })
           .catch((e) => {
-            console.log(e);
             socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
           });
+
+        break;
 
       default:
         socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
