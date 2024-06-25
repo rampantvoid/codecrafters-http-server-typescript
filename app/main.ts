@@ -75,7 +75,9 @@ const server = net.createServer((socket) => {
         const message = path.split("/")[2];
 
         if (headers["Accept-Encoding"] !== undefined) {
-          if (headers["Accept-Encoding"] !== "gzip") {
+          const acceptedEncoding = headers["Accept-Encoding"].split(", ");
+
+          if (!acceptedEncoding.includes("gzip")) {
             socket.write(
               "HTTP/1.1 200 OK\r\nContent-Type: text/plainr\r\n\r\n"
             );
