@@ -11,11 +11,22 @@ const server = net.createServer((socket) => {
 
   socket.on("data", (req: Buffer) => {
     const reqS = req.toString();
-    const path = reqS.split(" ")[1];
-    const res =
-      path === "/"
-        ? "HTTP/1.1 200 OK\r\n\r\n"
-        : "HTTP/1.1 404 Not Found\r\n\r\n";
+    const path: string = reqS.split(" ")[1];
+    console.log(path);
+    let res = "";
+
+    if (path === "/") {
+      res = "HTTP/1.1 200 OK\r\n\r\n";
+    } else if (path.startsWith("/echo/")) {
+      res = path.split("/")[1];
+    } else {
+      res = "HTTP/1.1 404 Not Found\r\n\r\n";
+    }
+
+    // const res =
+    //   path === "/"
+    //     ? "HTTP/1.1 200 OK\r\n\r\n"
+    //     : "HTTP/1.1 404 Not Found\r\n\r\n";
     socket.write(res);
     socket.end();
   });
