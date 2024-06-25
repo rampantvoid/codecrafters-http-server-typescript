@@ -1,3 +1,4 @@
+import { writeFile } from "fs";
 import { readFile } from "fs/promises";
 import * as net from "net";
 
@@ -61,7 +62,7 @@ const server = net.createServer((socket) => {
   });
 
   socket.on("data", (req: Buffer) => {
-    const { path, headers } = parseHttpRequest(req);
+    const { path, headers, method, body } = parseHttpRequest(req);
     const basePath = path.split("/")[1];
 
     switch (basePath) {
@@ -95,18 +96,27 @@ const server = net.createServer((socket) => {
         const filePath = baseFilePath + "/" + filename;
         let res = "";
 
-        readFile(filePath)
-          .then((data) => {
-            socket.write(
-              `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${
-                data.toString().length
-              }\r\n\r\n${data.toString()}`
-            );
+        if (method === "POST" && body != undefined) {
+          writeFile(filePath, body, () => {
+            socket.write("HTTP/1.1 201 Created\r\n\r\n");
             socket.end();
-          })
-          .catch((e) => {
-            socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
           });
+        }
+
+        if (method === "GET") {
+          readFile(filePath)
+            .then((data) => {
+              socket.write(
+                `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${
+                  data.toString().length
+                }\r\n\r\n${data.toString()}`
+              );
+              socket.end();
+            })
+            .catch((e) => {
+              socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+            });
+        }
 
         break;
 
