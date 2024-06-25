@@ -63,22 +63,33 @@ const server = net.createServer((socket) => {
   socket.on("data", (req: Buffer) => {
     const { path, headers } = parseHttpRequest(req);
 
-    if (path === "/") {
-      socket.write("HTTP/1.1 200 OK\r\n\r\n");
-      socket.end();
-    }
-    if (path === "/user-agent") {
-      const headerContent = headers["User-Agent"];
-
-      if (headerContent != undefined) {
-        socket.write(
-          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${headerContent.length}\r\n\r\n${headerContent}`
-        );
+    switch (path) {
+      case "/":
+        socket.write("HTTP/1.1 200 OK\r\n\r\n");
         socket.end();
-      }
-    } else {
-      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
-      socket.end();
+        break;
+
+      case "/echo":
+        const message = path.split("/")[2];
+        socket.write(
+          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
+        );
+        break;
+
+      case "/user-agent":
+        const headerContent = headers["User-Agent"];
+
+        if (headerContent != undefined) {
+          socket.write(
+            `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${headerContent.length}\r\n\r\n${headerContent}`
+          );
+          socket.end();
+        }
+        break;
+
+      default:
+        socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+        socket.end();
     }
   });
 });
