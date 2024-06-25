@@ -62,21 +62,22 @@ const server = net.createServer((socket) => {
 
   socket.on("data", (req: Buffer) => {
     const { path, headers } = parseHttpRequest(req);
-    console.log(path);
-    switch (path) {
-      case "/":
+    const basePath = path.split("/")[1];
+
+    switch (basePath) {
+      case "":
         socket.write("HTTP/1.1 200 OK\r\n\r\n");
         socket.end();
         break;
 
-      case "/echo":
+      case "echo":
         const message = path.split("/")[2];
         socket.write(
           `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
         );
         break;
 
-      case "/user-agent":
+      case "user-agent":
         const headerContent = headers["User-Agent"];
 
         if (headerContent != undefined) {
