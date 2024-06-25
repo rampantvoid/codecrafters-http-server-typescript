@@ -62,7 +62,7 @@ const server = net.createServer((socket) => {
 
   socket.on("data", (req: Buffer) => {
     const { path, headers } = parseHttpRequest(req);
-
+    console.log(path);
     switch (path) {
       case "/":
         socket.write("HTTP/1.1 200 OK\r\n\r\n");
