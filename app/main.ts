@@ -1,5 +1,5 @@
+import { readFile } from "fs/promises";
 import * as net from "net";
-import { devNull } from "os";
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
@@ -87,6 +87,24 @@ const server = net.createServer((socket) => {
           socket.end();
         }
         break;
+
+      case "files":
+        const filename = path.split("/")[2];
+        const args = process.argv.slice(2);
+        const [_, baseFilePath] = args;
+        const filePath = baseFilePath + "/" + filename;
+        let res = "";
+
+        readFile(filePath)
+          .then((data) => {
+            socket.write(
+              `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${data.length}\r\n\r\n${data}`
+            );
+            socket.end();
+          })
+          .catch((e) => {
+            socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+          });
 
       default:
         socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
