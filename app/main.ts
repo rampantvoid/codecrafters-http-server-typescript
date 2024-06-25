@@ -86,7 +86,7 @@ const server = net.createServer((socket) => {
           const cacheBuffer = Buffer.from(message, "utf8");
           const compressed = zlib.gzipSync(cacheBuffer);
           socket.write(
-            "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n"
+            `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: ${compressed.length}\r\n\r\n`
           );
           socket.write(compressed);
           socket.end();
