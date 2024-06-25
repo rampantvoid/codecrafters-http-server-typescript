@@ -30,7 +30,7 @@ const server = net.createServer((socket) => {
     } else if (pathVar === null) {
       res = "HTTP/1.1 404 Not Found\r\n\r\n";
     } else {
-      res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${tmp.length}\r\n\r\n${tmp}`;
+      res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${pathVar.length}\r\n\r\n${pathVar}`;
     }
 
     // const res =
