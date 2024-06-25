@@ -73,9 +73,17 @@ const server = net.createServer((socket) => {
 
       case "echo":
         const message = path.split("/")[2];
-        socket.write(
-          `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
-        );
+
+        if (headers["Accept-Encoding"] !== undefined) {
+          socket.write(
+            "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n"
+          );
+          socket.end();
+        } else {
+          socket.write(
+            `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${message.length}\r\n\r\n${message}`
+          );
+        }
         break;
 
       case "user-agent":
