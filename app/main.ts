@@ -1,7 +1,7 @@
 import { writeFile } from "fs";
 import { readFile } from "fs/promises";
 import * as net from "net";
-
+import * as zlib from "zlib";
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
@@ -83,9 +83,12 @@ const server = net.createServer((socket) => {
             );
             socket.end();
           }
+          const cacheBuffer = Buffer.from(message, "utf8");
+          const compressed = zlib.gzipSync(cacheBuffer);
           socket.write(
             "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\n\r\n"
           );
+          socket.write(compressed);
           socket.end();
         } else {
           socket.write(
